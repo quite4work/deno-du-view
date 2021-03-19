@@ -2,6 +2,7 @@ import * as base64 from "https://deno.land/std@0.90.0/encoding/base64.ts";
 import { Command } from "https://deno.land/x/cmd@v1.2.0/mod.ts";
 import { prettyBytes } from "https://denopkg.com/quite4work/deno-pretty-bytes";
 import { readLines } from "https://deno.land/std@0.90.0/io/mod.ts";
+import { html } from "https://deno.land/x/html@v1.0.0/mod.ts";
 
 export function sunburst(duOutput) {
   let flat = parse(duOutput);
@@ -47,7 +48,7 @@ function toTree(paths) {
 
 function genSunburstChartHtml(inputText, treeData) {
   let du_output = base64.encode(inputText);
-  return `
+  return html`
 <!DOCTYPE html>
 <html>
   <head>
