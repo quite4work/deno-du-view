@@ -2,14 +2,22 @@
 
 import * as du_view from "https://denopkg.com/quite4work/deno-du-view";
 import { Command } from "https://deno.land/x/cmd@v1.2.0/mod.ts";
+import { readLines } from "https://deno.land/std@0.90.0/io/bufio.ts";
 
 const cli = new Command();
 
-cli.command("generate <input_file>").action(generate);
+cli.command("generate [input_file]").action(generate);
 cli.parse(Deno.args);
 
 async function generate(input_file) {
-  let input = await Deno.readTextFile(input_file);
+  let input = "";
+  if (input_file) {
+    input = await Deno.readTextFile(input_file);
+  } else {
+    for await (const line of readLines(Deno.stdin)) {
+      input += line + "\n";
+    }
+  }
   let html = du_view.sunburst(input);
   await Deno.writeTextFile("du.html", html);
 }
