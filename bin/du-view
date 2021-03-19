@@ -1,0 +1,15 @@
+#!/usr/bin/env deno run --no-check --allow-read --allow-write --allow-env
+
+import * as du_view from "https://denopkg.com/quite4work/deno-du-view";
+import { Command } from "https://deno.land/x/cmd@v1.2.0/mod.ts";
+
+const cli = new Command();
+
+cli.command("generate <input_file>").action(generate);
+cli.parse(Deno.args);
+
+async function generate(input_file) {
+  let input = await Deno.readTextFile(input_file);
+  let html = du_view.sunburst(input);
+  await Deno.writeTextFile("du.html", html);
+}
