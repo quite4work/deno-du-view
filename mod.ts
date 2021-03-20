@@ -5,38 +5,37 @@ import { readLines } from "https://deno.land/std@0.90.0/io/mod.ts";
 import { html } from "https://deno.land/x/html@v1.0.0/mod.ts";
 
 export function sunburst(duOutput) {
-  let flat = parse(duOutput);
-  let tree = toTree(flat);
-  return genSunburstChartHtml(duOutput, tree);
+  const duFlat = parse(duOutput);
+  duFlat.sort((a, b) => (a.path > b.path) ? 1 : -1);
+  const duTree = toTree(duFlat);
+  return genSunburstChartHtml(duOutput, duTree);
 }
 
 function parse(duOutput) {
-  let res = [];
-  for (let line of duOutput.split("\n")) {
-    line = line.trim();
-    if (line.length > 0) {
-      let [size, path] = line.split(/\t/);
+  const res = [];
+  for (const line of duOutput.split("\n")) {
+    if (line.trim().length > 0) {
+      const [size, path] = line.split(/\t/);
       res.push({
         size: Number(size),
-        path: path,
+        path: path.split("/"),
       });
     }
   }
-  res.sort((a, b) => (a.path > b.path) ? 1 : -1);
   return res;
 }
 
 function toTree(paths) {
-  let result = [];
-  let level = { result };
+  const result = [];
+  const level = { result };
   paths.forEach(({ path, size }) => {
-    path.split("/").reduce((acc, name) => {
+    path.reduce((acc, name) => {
       if (!acc[name]) {
         acc[name] = { pathAcc: [], result: [] };
         acc.result.push({
           name,
           value: size,
-          prettySize: prettyBytes(size * 1000), // du outputs in kilo bytes
+          prettySize: prettyBytes(size * 1000), // du outputs in kilo bytes ?
           children: acc[name].result,
         });
       }
@@ -47,7 +46,7 @@ function toTree(paths) {
 }
 
 function genSunburstChartHtml(inputText, treeData) {
-  let du_output = base64.encode(inputText);
+  const du_output = base64.encode(inputText);
   return html`
 <!DOCTYPE html>
 <html>
