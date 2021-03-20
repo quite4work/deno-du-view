@@ -3,9 +3,16 @@ import { Command } from "https://deno.land/x/cmd@v1.2.0/mod.ts";
 import { prettyBytes } from "https://denopkg.com/quite4work/deno-pretty-bytes";
 import { readLines } from "https://deno.land/std@0.90.0/io/mod.ts";
 import { html } from "https://deno.land/x/html@v1.0.0/mod.ts";
+import * as path from "https://deno.land/std@0.90.0/path/mod.ts";
 
-export function sunburst(duOutput) {
-  const duFlat = parse(duOutput);
+export function sunburst(duOutput, { strip }) {
+  let duFlat = parse(duOutput);
+  if (strip) {
+    for (const o of duFlat) {
+      o.path = o.path.slice(strip);
+    }
+  }
+  duFlat = duFlat.filter(({ path }) => path.length > 0);
   duFlat.sort((a, b) => (a.path > b.path) ? 1 : -1);
   const duTree = toTree(duFlat);
   return genSunburstChartHtml(duOutput, duTree);

@@ -7,19 +7,30 @@ import { Webview } from "https://deno.land/x/webview@0.5.6/mod.ts";
 
 const cli = new Command();
 
-cli.command("generate [input_file]").action(generate);
+cli.option(
+  "-s --strip <number>",
+  "Remove leading path elements",
+  parseInt,
+);
+cli.command("generate [input_file]").option(
+  "-o --out <path>",
+  "Output file",
+  "du.html",
+).action(generate);
 cli.command("show [input_file]").action(show);
 cli.parse(Deno.args);
 
-async function generate(input_file) {
+async function generate(input_file, { out }) {
+  let { strip } = cli.opts();
   let input = await readInput(input_file);
-  let html = du_view.sunburst(input);
-  await Deno.writeTextFile("du.html", html);
+  let html = du_view.sunburst(input, { strip });
+  await Deno.writeTextFile(out, html);
 }
 
 async function show(input_file) {
+  let { strip } = cli.opts();
   let input = await readInput(input_file);
-  let html = du_view.sunburst(input);
+  let html = du_view.sunburst(input, { strip });
   const webview = new Webview({
     url: `data:text/html,${encodeURIComponent(html)}`,
   });
