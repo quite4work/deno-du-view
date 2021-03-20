@@ -69,7 +69,9 @@ function genSunburstChartHtml(inputText, treeData) {
 
 function script(data) {
   const color = d3.scaleOrdinal(d3.schemePaired);
-  Sunburst().data(data).label((d) => d.name + " " + d.prettySize).color((
+  Sunburst().data(data).excludeRoot(true).label((d) =>
+    d.name + " " + d.prettySize
+  ).color((
     d,
   ) => color(d.name)).tooltipTitle((d) => d.name).tooltipContent((
     d,
